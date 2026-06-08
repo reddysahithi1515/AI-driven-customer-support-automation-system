@@ -1,1 +1,105 @@
+CUSTOMER SUPPORT AI BUSINESS RULE
+(function executeRule(current, previous) {
 
+    var ai = new CustomerSupportAI();
+
+    current.ai_response = ai.getResponse(current.question);
+
+    if (current.ai_response == "Incident Created") {
+        current.status = "Escalated";
+    }
+    else {
+        current.status = "Resolved";
+    }
+
+})(current, previous);
+
+
+SET SEVERITY BUSINESS RULE
+(function executeRule(current, previous) {
+
+    var util = new FeedbackSeverityUtils();
+
+    current.severity = util.getSeverity(current.rating);
+
+})(current, previous);
+
+FEEDBACK SEVERITY UTILS SCRIPT INCLUDES
+var FeedbackSeverityUtils = Class.create();
+FeedbackSeverityUtils.prototype = {
+    initialize: function() {
+    },
+
+    getSeverity: function(rating) {
+
+        if (rating == 1)
+            return 'critical';
+
+        else if (rating == 2)
+            return 'Moderate';
+
+        else
+            return 'Low';
+    },
+
+    type: 'FeedbackSeverityUtils'
+};
+
+
+CUSTOMER SUPPORT AI SCRIPT INCLUDE
+var CustomerSupportAI = Class.create();
+CustomerSupportAI.prototype = {
+    initialize: function() {
+    },
+
+    getResponse: function(question) {
+
+        question = question.toLowerCase();
+
+        if (question.indexOf("order") > -1) {
+            return "Your order has been shipped and will arrive soon.";
+        }
+
+        else if (question.indexOf("cancel") > -1) {
+            return "Orders can be cancelled before shipment. Please contact customer support.";
+        }
+
+        else if (question.indexOf("speaker") > -1) {
+            return "Charge the device for 30 minutes and reset it.";
+        }
+
+        else if (question.indexOf("password") > -1) {
+            return "Reset your password using the Forgot Password option.";
+        }
+
+        else if (question.indexOf("delivery") > -1) {
+            return "Delayed deliveries are usually resolved within 2 business days.";
+        }
+
+        else if (question.indexOf("refund") > -1) {
+            return "Refunds are processed within 5-7 business days.";
+        }
+
+        else if (question.indexOf("warranty") > -1) {
+            return "Products are covered under a one-year warranty period.";
+        }
+
+        else if (question.indexOf("payment") > -1) {
+            return "Please verify your payment details and try again.";
+        }
+
+        else if (question.indexOf("battery") > -1) {
+            return "Avoid overcharging and use the original charger.";
+        }
+
+        else if (question.indexOf("charging") > -1) {
+            return "Please clean the charging port and try another cable.";
+        }
+
+        else {
+            return "Incident Created";
+        }
+    },
+
+    type: 'CustomerSupportAI'
+};
